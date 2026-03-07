@@ -34,7 +34,7 @@ function App() {
     localStorage.setItem('koleksiyonum', JSON.stringify(items));
   }, [items]);
 
-  const toplamDeger = items.reduce((toplam, item) => {
+  const toplamDeger = items.reduce((toplam: number, item: Esya) => {
     const rakam = parseInt(item.deger.replace(/[^0-9]/g, '')) || 0;
     return toplam + rakam;
   }, 0);
@@ -70,7 +70,7 @@ function App() {
   };
 
   const esyaSil = (silinecekId: number) => {
-    const guncelListe = items.filter(item => item.id !== silinecekId);
+    const guncelListe = items.filter((item: Esya) => item.id !== silinecekId);
     setItems(guncelListe);
   };
 
@@ -100,7 +100,8 @@ function App() {
         </div>
 
         <div className="item-list">
-          {items.map((item) => (
+          {/* Burada 'item' yanına ': Esya' ekleyerek kimlik tanımlıyoruz */}
+          {items.map((item: Esya) => (
             <div key={item.id} className="item-card" style={{ borderLeftColor: item.renk }}>
               <div className="item-info">
                 <h3>{item.isim}</h3>
