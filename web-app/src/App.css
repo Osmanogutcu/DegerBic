@@ -11,14 +11,29 @@ body {
   justify-content: center;
 }
 
+/* --- ANA KONTEYNER GÜNCELLEMESİ --- */
 .mobile-app-container {
   width: 100%;
-  max-width: 480px;
+  max-width: 800px;
+  /* Bilgisayarda çok dar durmaması için genişliği artırdık */
   min-height: 100vh;
-  background-color: #ffffff;
+  margin: 0 auto;
+  background-color: #f3f4f6;
+  display: flex;
+  flex-direction: column;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-  position: relative;
-  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+}
+
+/* --- EŞYA KARTLARINI YAN YANA DİZELİM (OPSİYONEL) --- */
+/* Bilgisayar ekranında kartların yan yana 2'şerli durmasını istersen bunu ekle */
+@media (min-width: 600px) {
+  .item-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* Kartları iki sütuna böler */
+    gap: 15px;
+  }
 }
 
 .app-header {
