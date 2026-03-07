@@ -7,20 +7,19 @@
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: #e5e7eb;
-  /* Arka planı hafif gri yaptık ki uygulama öne çıksın */
   display: flex;
   justify-content: center;
-  /* Sayfayı ortala */
 }
 
-/* Mobil uygulama gibi görünmesi için bir çerçeve */
 .mobile-app-container {
   width: 100%;
   max-width: 480px;
-  /* Telefon ekranı genişliği */
   min-height: 100vh;
   background-color: #ffffff;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  position: relative;
+  /* Formun doğru hizalanması için gerekli */
+  overflow: hidden;
 }
 
 .app-header {
@@ -48,8 +47,6 @@ body {
   margin-top: 20px;
 }
 
-/* --- YENİ EKLENEN KISIMLAR --- */
-
 .content-header {
   display: flex;
   justify-content: space-between;
@@ -76,14 +73,12 @@ body {
   display: flex;
   flex-direction: column;
   gap: 15px;
-  /* Kartlar arası boşluk */
 }
 
 .item-card {
   background: #f9fafb;
   border: 1px solid #e5e7eb;
   border-left: 5px solid #3b82f6;
-  /* Varsayılan sol çizgi */
   border-radius: 12px;
   padding: 15px;
   display: flex;
@@ -116,7 +111,6 @@ body {
 .item-value {
   font-weight: bold;
   color: #059669;
-  /* Yeşil renk (Para) */
   font-size: 15px;
 }
 
@@ -136,4 +130,134 @@ body {
 
 .add-button:hover {
   background-color: #1e40af;
+}
+
+/* --- EŞYA EKLEME FORMU (MODAL) --- */
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  z-index: 100;
+}
+
+.modal-content {
+  background: #ffffff;
+  width: 100%;
+  padding: 25px;
+  border-top-left-radius: 25px;
+  border-top-right-radius: 25px;
+  box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.15);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+.modal-content h2 {
+  margin-bottom: 20px;
+  color: #1f2937;
+  font-size: 22px;
+}
+
+.input-group {
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.input-group label {
+  display: block;
+  font-size: 14px;
+  color: #4b5563;
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+
+.input-group input,
+.input-group select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 15px;
+  background-color: #f9fafb;
+  color: #000000;
+  /* YAZILARIN SİYAH GÖRÜNMESİNİ SAĞLAYAN SİHİRLİ KOD */
+}
+
+
+.input-group input:focus,
+.input-group select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background-color: #fff;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+.cancel-btn {
+  flex: 1;
+  padding: 14px;
+  background: #f3f4f6;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  color: #4b5563;
+  cursor: pointer;
+}
+
+.save-btn {
+  flex: 2;
+  padding: 14px;
+  background: #10b981;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+}
+
+.save-btn:hover {
+  background: #059669;
+}
+
+/* --- SİL BUTONU TASARIMI --- */
+.item-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.delete-btn {
+  background-color: #fee2e2;
+  color: #ef4444;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.delete-btn:hover {
+  background-color: #ef4444;
+  color: white;
 }
