@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
+// TYPESCRIPT İÇİN KİMLİK KARTI (Interface)
+// Bu kısım alttaki tüm kırmızı çizgileri (item.id, item.isim vb.) yok eder.
 interface Esya {
   id: number;
   isim: string;
@@ -10,36 +12,35 @@ interface Esya {
 }
 
 function App() {
+  // 1. KALICI HAFIZA (Local Storage): Tarayıcıda kayıtlı veri varsa getir
   const [items, setItems] = useState<Esya[]>(() => {
     const kayitliVeri = localStorage.getItem('koleksiyonum');
     if (kayitliVeri) {
       return JSON.parse(kayitliVeri);
     }
-    return [
-      { id: 1, isim: 'Charizard Base Set', kategori: 'Koleksiyon Kartı', deger: '15000 TL', renk: '#ef4444' },
-      { id: 2, isim: '50 Yıllık İran İpek Halı', kategori: 'Antika', deger: '45000 TL', renk: '#eab308' },
-      { id: 3, isim: 'İşlemeli Bakır Tepsi', kategori: 'Ev Eşyası', deger: '3500 TL', renk: '#f97316' }
-    ];
+    // Başlangıçta liste boş gelsin (Seninkileri sildiğin için)
+    return [];
   });
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isim, setIsim] = useState('');
   const [kategori, setKategori] = useState('Antika');
   const [deger, setDeger] = useState('');
-
-  // YENİ: Sadece görsel olarak fotoğrafın seçildiğini göstermek için
   const [secilenFoto, setSecilenFoto] = useState<string | null>(null);
 
+  // 2. HAFIZAYI GÜNCELLE: Liste her değiştiğinde tarayıcıya kaydet
   useEffect(() => {
     localStorage.setItem('koleksiyonum', JSON.stringify(items));
   }, [items]);
 
+  // 3. TOPLAM DEĞER ALGORİTMASI: Dizideki fiyatları toplar
+  // (toplam: number, item: Esya) belirteçleri kırmızı çizgileri çözer.
   const toplamDeger = items.reduce((toplam: number, item: Esya) => {
     const rakam = parseInt(item.deger.replace(/[^0-9]/g, '')) || 0;
     return toplam + rakam;
   }, 0);
 
-  // Fotoğraf seçildiğinde sadece adını ekranda gösterir (API yok)
+  // Fotoğraf seçme simülasyonu
   const fotoSecildi = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -62,13 +63,14 @@ function App() {
     };
     setItems([...items, yeniEsya]);
 
-    // Formu temizle
+    // Formu temizle ve kapat
     setIsFormOpen(false);
     setIsim('');
     setDeger('');
     setSecilenFoto(null);
   };
 
+  // Silme fonksiyonu
   const esyaSil = (silinecekId: number) => {
     const guncelListe = items.filter((item: Esya) => item.id !== silinecekId);
     setItems(guncelListe);
@@ -89,6 +91,7 @@ function App() {
       </header>
 
       <main className="app-content">
+        {/* TOPLAM DEĞER KARTI */}
         <div className="total-value-card">
           <h3>Toplam Portföy Değeri</h3>
           <div className="amount">{toplamDeger.toLocaleString('tr-TR')} TL</div>
@@ -100,7 +103,7 @@ function App() {
         </div>
 
         <div className="item-list">
-          {/* Burada 'item' yanına ': Esya' ekleyerek kimlik tanımlıyoruz */}
+          {/* LİSTELEME: (item: Esya) yazısı kırmızı çizgileri çözer */}
           {items.map((item: Esya) => (
             <div key={item.id} className="item-card" style={{ borderLeftColor: item.renk }}>
               <div className="item-info">
@@ -120,12 +123,12 @@ function App() {
         </button>
       </main>
 
+      {/* MODAL FORM */}
       {isFormOpen && (
         <div className="modal-overlay">
           <div className="modal-content">
             <h2>Yeni Eşya Ekle</h2>
 
-            {/* VİZYON İÇİN FOTOĞRAF YÜKLEME ALANI (SAHTE ANİMASYON YOK) */}
             <div className="upload-area">
               <input type="file" accept="image/*" onChange={fotoSecildi} />
               <div className="upload-content">
@@ -167,7 +170,6 @@ function App() {
                 <button type="submit" className="save-btn">Kaydet</button>
               </div>
             </form>
-
           </div>
         </div>
       )}
