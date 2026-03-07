@@ -1,0 +1,139 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #e5e7eb;
+  /* Arka planı hafif gri yaptık ki uygulama öne çıksın */
+  display: flex;
+  justify-content: center;
+  /* Sayfayı ortala */
+}
+
+/* Mobil uygulama gibi görünmesi için bir çerçeve */
+.mobile-app-container {
+  width: 100%;
+  max-width: 480px;
+  /* Telefon ekranı genişliği */
+  min-height: 100vh;
+  background-color: #ffffff;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.app-header {
+  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+  color: white;
+  padding: 24px 20px;
+  text-align: center;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+
+.app-header h1 {
+  font-size: 28px;
+  margin-bottom: 5px;
+}
+
+.app-header p {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.app-content {
+  padding: 20px;
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* --- YENİ EKLENEN KISIMLAR --- */
+
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.content-header h2 {
+  font-size: 20px;
+  color: #1f2937;
+}
+
+.item-count {
+  background-color: #dbeafe;
+  color: #1e3a8a;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  /* Kartlar arası boşluk */
+}
+
+.item-card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-left: 5px solid #3b82f6;
+  /* Varsayılan sol çizgi */
+  border-radius: 12px;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s;
+}
+
+.item-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.item-info {
+  text-align: left;
+}
+
+.item-info h3 {
+  font-size: 16px;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.item-category {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.item-value {
+  font-weight: bold;
+  color: #059669;
+  /* Yeşil renk (Para) */
+  font-size: 15px;
+}
+
+.add-button {
+  margin-top: 30px;
+  width: 100%;
+  padding: 15px;
+  background-color: #1e3a8a;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(30, 58, 138, 0.2);
+}
+
+.add-button:hover {
+  background-color: #1e40af;
+}
