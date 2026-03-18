@@ -1,174 +1,229 @@
 import React, { useState, useEffect } from 'react';
-import './App.css'; // Orijinal CSS dosyanız
+import './App.css';
 
-// --- 1. TİP TANIMLAMALARI (TypeScript Sihri) ---
-// Sistemdeki bir "Eşyanın" neye benzeyeceğini TypeScript'e öğretiyoruz.
-interface Item {
-  id: string;
-  name: string;
-  price: number;
-  category: string;
+// TYPESCRIPT İÇİN KİMLİK KARTI (Interface)
+interface Esya {
+  id: number;
+  isim: string;
+  kategori: string;
+  deger: string;
+  renk: string;
 }
 
 function App() {
-  // --- 2. STATE YÖNETİMİ ---
-  // items state'inin "Item" tipinde bir dizi (<Item[]>) olduğunu belirtiyoruz.
-  const [items, setItems] = useState<Item[]>(() => {
-    const savedItems = localStorage.getItem('degerbic_items');
-    return savedItems ? JSON.parse(savedItems) : [];
+  // 1. KALICI HAFIZA (Local Storage)
+  const [items, setItems] = useState<Esya[]>(() => {
+    const kayitliVeri = localStorage.getItem('koleksiyonum');
+    if (kayitliVeri) {
+      return JSON.parse(kayitliVeri);
+    }
+    return [];
   });
 
-  const [name, setName] = useState('');
-  const [price, setPrice] = useState('');
-  const [category, setCategory] = useState('Elektronik');
+  // Orijinal State'lerin
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isim, setIsim] = useState('');
+  const [kategori, setKategori] = useState('Antika');
+  const [deger, setDeger] = useState('');
+  const [secilenFoto, setSecilenFoto] = useState<string | null>(null);
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterCategory, setFilterCategory] = useState('Tümü');
-
-  const categories = ['Elektronik', 'Antika', 'Koleksiyon', 'Giyim', 'Diğer'];
+  // YENİ: Arama ve Filtreleme State'leri (5. Hafta)
+  const [aramaSorgusu, setAramaSorgusu] = useState('');
+  const [filtreKategori, setFiltreKategori] = useState('Tümü');
 
   useEffect(() => {
-    localStorage.setItem('degerbic_items', JSON.stringify(items));
+    localStorage.setItem('koleksiyonum', JSON.stringify(items));
   }, [items]);
 
-  // --- 3. EŞYA EKLEME ---
-  // 'e'nin bir Form Etkinliği (React.FormEvent) olduğunu belirttik (Kırmızı çizgi gitti!)
-  const addItem = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!name.trim()) {
-      alert('⚠️ Lütfen geçerli bir eşya adı girin!');
-      return;
-    }
-    if (!price || Number(price) <= 0) {
-      alert('⚠️ Fiyat 0 veya negatif olamaz!');
-      return;
-    }
-
-    const newItem: Item = {
-      id: crypto.randomUUID(),
-      name: name.trim(),
-      price: parseFloat(price),
-      category: category
-    };
-
-    setItems([...items, newItem]);
-
-    setName('');
-    setPrice('');
-    setCategory('Elektronik');
-  };
-
-  // --- 4. EŞYA SİLME ---
-  // 'id'nin bir metin (string) olduğunu belirttik (Kırmızı çizgi gitti!)
-  const deleteItem = (id: string) => {
-    setItems(items.filter(item => item.id !== id));
-  };
-
-  // --- 5. FİLTRELEME VE ARAMA ---
-  // Eşyalarımızın tipi belli olduğu için buradaki 'item' kelimelerinin de altı çizilmeyecek.
-  const filteredItems = items.filter(item => {
-    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = filterCategory === 'Tümü' || item.category === filterCategory;
-    return matchesSearch && matchesCategory;
+  // YENİ: FİLTRELEME MOTORU
+  // Ekranda sadece arama ve kategoriye uyan eşyaları gösterir
+  const filtrelenmisEsyalar = items.filter((item) => {
+    const aramaUyumu = item.isim.toLowerCase().includes(aramaSorgusu.toLowerCase());
+    const kategoriUyumu = filtreKategori === 'Tümü' || item.kategori === filtreKategori;
+    return aramaUyumu && kategoriUyumu;
   });
 
-  const totalValue = filteredItems.reduce((total, item) => total + item.price, 0);
+  // GÜNCELLEME: Toplam değer artık sadece "filtrelenmiş" (ekranda görünen) eşyaları hesaplar
+  const toplamDeger = filtrelenmisEsyalar.reduce((toplam: number, item: Esya) => {
+    const rakam = parseInt(item.deger.replace(/[^0-9]/g, '')) || 0;
+    return toplam + rakam;
+  }, 0);
+
+  const fotoSecildi = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSecilenFoto(file.name);
+    }
+  };
+
+  const esyaKaydet = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // YENİ: HATA KONTROLÜ (Form Validasyonu - 4. Hafta)
+    if (!isim.trim() || !deger) {
+      alert("⚠️ Lütfen isim ve değer alanlarını doldurun!");
+      return;
+    }
+    if (Number(deger) <= 0) {
+      alert("⚠️ Eşyanın tahmini değeri 0 veya negatif olamaz!");
+      return;
+    }
+
+    const yeniEsya: Esya = {
+      id: Date.now(),
+      isim: isim.trim(),
+      kategori: kategori,
+      deger: deger + ' TL',
+      renk: '#8b5cf6' // Senin orijinal mor rengin
+    };
+
+    setItems([...items, yeniEsya]);
+
+    // Formu temizle ve kapat
+    setIsFormOpen(false);
+    setIsim('');
+    setDeger('');
+    setSecilenFoto(null);
+  };
+
+  const esyaSil = (silinecekId: number) => {
+    const guncelListe = items.filter((item: Esya) => item.id !== silinecekId);
+    setItems(guncelListe);
+  };
+
+  const formuKapat = () => {
+    setIsFormOpen(false);
+    setIsim('');
+    setDeger('');
+    setSecilenFoto(null);
+  }
 
   return (
-    <div className="app-container">
-      <header>
-        <h1>DeğerBiç 💎</h1>
-        <p>Kişisel Envanter ve Değer Takip Sistemi</p>
+    <div className="mobile-app-container">
+      <header className="app-header">
+        <h1>DeğerBiç 🔍</h1>
+        <p>Envanter ve Değerleme Asistanı</p>
       </header>
 
-      <main>
-        {/* ARAMA VE FİLTRELEME ÇUBUĞU */}
-        <section className="filter-section" style={{ marginBottom: '20px', padding: '15px', background: '#f8f9fa', borderRadius: '8px', display: 'flex', gap: '10px' }}>
+      <main className="app-content">
+        {/* TOPLAM DEĞER KARTI (Orijinal tasarımın) */}
+        <div className="total-value-card">
+          <h3>Toplam Portföy Değeri</h3>
+          <div className="amount">{toplamDeger.toLocaleString('tr-TR')} TL</div>
+        </div>
+
+        {/* YENİ: ARAMA VE FİLTRELEME ÇUBUĞU */}
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', marginTop: '10px' }}>
           <input
             type="text"
             placeholder="🔍 Eşya Ara..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ flex: 1, padding: '10px', borderRadius: '5px', border: '1px solid #ddd' }}
+            value={aramaSorgusu}
+            onChange={(e) => setAramaSorgusu(e.target.value)}
+            style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #ddd', outline: 'none' }}
           />
           <select
-            value={filterCategory}
-            onChange={(e) => setFilterCategory(e.target.value)}
-            style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ddd' }}
+            value={filtreKategori}
+            onChange={(e) => setFiltreKategori(e.target.value)}
+            style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ddd', outline: 'none', backgroundColor: 'white', color: 'black' }}
           >
             <option value="Tümü">Tüm Kategoriler</option>
-            {categories.map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
-            ))}
+            <option value="Koleksiyon Kartı">Koleksiyon Kartı</option>
+            <option value="Antika">Antika</option>
+            <option value="Ev Eşyası">Ev Eşyası</option>
+            <option value="Diğer">Diğer</option>
           </select>
-        </section>
+        </div>
 
-        {/* EŞYA EKLEME FORMU */}
-        <section className="add-item-section" style={{ marginBottom: '30px' }}>
-          <form onSubmit={addItem} style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-            <input
-              type="text"
-              placeholder="Eşya Adı"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              style={{ flex: 1, padding: '10px' }}
-            />
-            <input
-              type="number"
-              placeholder="Değeri (₺)"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              style={{ width: '120px', padding: '10px' }}
-            />
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              style={{ padding: '10px' }}
-            >
-              {categories.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
-            <button type="submit" style={{ padding: '10px 20px', background: '#2563eb', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-              Ekle
-            </button>
-          </form>
-        </section>
+        <div className="content-header">
+          <h2>Koleksiyonum</h2>
+          {/* Orijinal item.length yerine filtrelenmisEsyalar.length kullanıyoruz */}
+          <span className="item-count">{filtrelenmisEsyalar.length} Eşya</span>
+        </div>
 
-        {/* ENVANTER LİSTESİ */}
-        <section className="inventory-section">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #eee', paddingBottom: '10px', marginBottom: '20px' }}>
-            <h2>Envanteriniz ({filteredItems.length} Eşya)</h2>
-            <div style={{ fontSize: '1.2rem', color: '#16a34a' }}>
-              Toplam: <strong>{totalValue.toLocaleString('tr-TR')} ₺</strong>
-            </div>
-          </div>
+        <div className="item-list">
+          {/* LİSTELEME: Artık 'items' yerine 'filtrelenmisEsyalar' dönüyor */}
+          {filtrelenmisEsyalar.length === 0 ? (
+            <p style={{ textAlign: 'center', color: '#888', marginTop: '20px' }}>Bu kriterlere uygun eşya bulunamadı.</p>
+          ) : (
+            filtrelenmisEsyalar.map((item: Esya) => (
+              <div key={item.id} className="item-card" style={{ borderLeftColor: item.renk }}>
+                <div className="item-info">
+                  <h3>{item.isim}</h3>
+                  <span className="item-category">{item.kategori}</span>
+                </div>
+                <div className="item-actions">
+                  <div className="item-value">{item.deger}</div>
+                  <button className="delete-btn" onClick={() => esyaSil(item.id)}>Sil</button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
 
-          <ul style={{ listStyle: 'none', padding: 0 }}>
-            {filteredItems.length === 0 ? (
-              <p style={{ textAlign: 'center', color: '#888' }}>Bu kriterlere uygun eşya bulunamadı.</p>
-            ) : (
-              filteredItems.map(item => (
-                <li key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px', background: 'white', border: '1px solid #eee', borderRadius: '8px', marginBottom: '10px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
-                  <div>
-                    <strong style={{ display: 'block', fontSize: '1.1rem' }}>{item.name}</strong>
-                    <span style={{ fontSize: '0.8rem', background: '#e0e7ff', color: '#3730a3', padding: '3px 8px', borderRadius: '12px', marginTop: '5px', display: 'inline-block' }}>
-                      {item.category || 'Diğer'}
-                    </span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                    <span style={{ fontWeight: 'bold' }}>{item.price.toLocaleString('tr-TR')} ₺</span>
-                    <button onClick={() => deleteItem(item.id)} style={{ background: '#dc2626', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '5px', cursor: 'pointer' }}>
-                      Sil
-                    </button>
-                  </div>
-                </li>
-              ))
-            )}
-          </ul>
-        </section>
+        <button className="add-button" onClick={() => setIsFormOpen(true)}>
+          + Yeni Eşya Ekle
+        </button>
       </main>
+
+      {/* MODAL FORM (Senin orijinal fotoğraf yüklemeli formun) */}
+      {isFormOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2>Yeni Eşya Ekle</h2>
+
+            <div className="upload-area">
+              <input type="file" accept="image/*" onChange={fotoSecildi} />
+              <div className="upload-content">
+                <span className="camera-icon">📸</span>
+                {secilenFoto ? (
+                  <p className="success-text">✅ {secilenFoto}</p>
+                ) : (
+                  <>
+                    <p><strong>Eşyanın Fotoğrafını Yükle</strong></p>
+                    <p className="small-text">(Yapay zeka analizi ilerleyen sürümlerde eklenecektir)</p>
+                  </>
+                )}
+              </div>
+            </div>
+
+            <form onSubmit={esyaKaydet}>
+              <div className="input-group">
+                <label>Eşya Adı</label>
+                <input type="text" placeholder="Örn: 50 Yıllık Halı" value={isim} onChange={(e) => setIsim(e.target.value)} />
+              </div>
+
+              <div className="input-group">
+                <label>Kategori</label>
+                <select value={kategori} onChange={(e) => setKategori(e.target.value)}>
+                  <option value="Koleksiyon Kartı">Koleksiyon Kartı</option>
+                  <option value="Antika">Antika</option>
+                  <option value="Ev Eşyası">Ev Eşyası</option>
+                  <option value="Diğer">Diğer</option>
+                </select>
+              </div>
+
+              <div className="input-group">
+                <label>Kategori</label>
+                <select
+                  value={kategori}
+                  onChange={(e) => setKategori(e.target.value)}
+                  style={{ backgroundColor: 'white', color: 'black', padding: '10px', borderRadius: '5px' }}
+                >
+                  <option value="Koleksiyon Kartı">Koleksiyon Kartı</option>
+                  <option value="Antika">Antika</option>
+                  <option value="Ev Eşyası">Ev Eşyası</option>
+                  <option value="Diğer">Diğer</option>
+                </select>
+              </div>
+
+              <div className="modal-buttons">
+                <button type="button" className="cancel-btn" onClick={formuKapat}>İptal</button>
+                <button type="submit" className="save-btn">Kaydet</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
