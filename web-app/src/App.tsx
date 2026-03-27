@@ -203,17 +203,8 @@ function App() {
               </div>
 
               <div className="input-group">
-                <label>Kategori</label>
-                <select
-                  value={kategori}
-                  onChange={(e) => setKategori(e.target.value)}
-                  style={{ backgroundColor: 'white', color: 'black', padding: '10px', borderRadius: '5px' }}
-                >
-                  <option value="Koleksiyon Kartı">Koleksiyon Kartı</option>
-                  <option value="Antika">Antika</option>
-                  <option value="Ev Eşyası">Ev Eşyası</option>
-                  <option value="Diğer">Diğer</option>
-                </select>
+                <label>Tahmini Değer (TL)</label>
+                <input type="number" placeholder="Örn: 5000" value={deger} onChange={(e) => setDeger(e.target.value)} />
               </div>
 
               <div className="modal-buttons">
