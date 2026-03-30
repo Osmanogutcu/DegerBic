@@ -444,3 +444,198 @@ body {
   color: #059669 !important;
   font-weight: bold;
 }
+
+/* ========================================
+   HAFTA 6: AUTH SAYFA STİLLERİ
+   ======================================== */
+
+/* --- AUTH SAYFA (Login/Register) --- */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #3b82f6 100%);
+  padding: 20px;
+}
+
+.auth-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 40px 35px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: authFadeIn 0.5s ease-out;
+}
+
+@keyframes authFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.auth-header h1 {
+  font-size: 28px;
+  color: #1e3a8a;
+  margin-bottom: 8px;
+}
+
+.auth-header p {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.auth-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.auth-input-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.auth-input-group input {
+  padding: 12px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 15px;
+  color: #111827;
+  background-color: #f9fafb;
+  transition: all 0.3s;
+  outline: none;
+}
+
+.auth-input-group input:focus {
+  border-color: #3b82f6;
+  background-color: #fff;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.auth-submit-btn {
+  margin-top: 10px;
+  padding: 14px;
+  background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+}
+
+.auth-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(30, 58, 138, 0.4);
+}
+
+.auth-error {
+  background-color: #fef2f2;
+  color: #dc2626;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  text-align: center;
+  border: 1px solid #fecaca;
+  margin-bottom: 5px;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.auth-link {
+  color: #3b82f6 !important;
+  font-weight: bold;
+  text-decoration: none !important;
+}
+
+.auth-link:hover {
+  color: #1e3a8a !important;
+  text-decoration: underline !important;
+}
+
+/* --- HEADER ÜST KISIM (Kullanıcı Bilgisi) --- */
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.header-user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-avatar {
+  font-size: 20px;
+}
+
+.user-name {
+  font-size: 14px;
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+.logout-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.logout-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* --- YENİ EŞYA KART BİLGİLERİ --- */
+.item-kondisyon {
+  display: inline-block;
+  font-size: 11px;
+  color: #1e3a8a;
+  background-color: #dbeafe;
+  padding: 2px 8px;
+  border-radius: 6px;
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+.item-description {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 6px;
+  line-height: 1.4;
+}

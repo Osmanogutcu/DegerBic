@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from './context/AuthContext';
 import './App.css';
 
 // TYPESCRIPT İÇİN KİMLİK KARTI (Interface)
@@ -8,9 +9,13 @@ interface Esya {
   kategori: string;
   deger: string;
   renk: string;
+  aciklama: string;
+  kondisyon: string;
 }
 
 function App() {
+  const { kullanici, cikisYap } = useAuth();
+
   // 1. KALICI HAFIZA (Local Storage)
   const [items, setItems] = useState<Esya[]>(() => {
     const kayitliVeri = localStorage.getItem('koleksiyonum');
@@ -26,6 +31,8 @@ function App() {
   const [kategori, setKategori] = useState('Antika');
   const [deger, setDeger] = useState('');
   const [secilenFoto, setSecilenFoto] = useState<string | null>(null);
+  const [aciklama, setAciklama] = useState('');
+  const [kondisyon, setKondisyon] = useState('İyi');
 
   // YENİ: Arama ve Filtreleme State'leri (5. Hafta)
   const [aramaSorgusu, setAramaSorgusu] = useState('');
@@ -59,7 +66,7 @@ function App() {
   const esyaKaydet = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // YENİ: HATA KONTROLÜ (Form Validasyonu - 4. Hafta)
+    // HATA KONTROLÜ (Form Validasyonu)
     if (!isim.trim() || !deger) {
       alert("⚠️ Lütfen isim ve değer alanlarını doldurun!");
       return;
@@ -74,7 +81,9 @@ function App() {
       isim: isim.trim(),
       kategori: kategori,
       deger: deger + ' TL',
-      renk: '#8b5cf6' // Senin orijinal mor rengin
+      renk: '#8b5cf6',
+      aciklama: aciklama.trim(),
+      kondisyon: kondisyon
     };
 
     setItems([...items, yeniEsya]);
@@ -84,6 +93,8 @@ function App() {
     setIsim('');
     setDeger('');
     setSecilenFoto(null);
+    setAciklama('');
+    setKondisyon('İyi');
   };
 
   const esyaSil = (silinecekId: number) => {
@@ -96,23 +107,34 @@ function App() {
     setIsim('');
     setDeger('');
     setSecilenFoto(null);
+    setAciklama('');
+    setKondisyon('İyi');
   }
 
   return (
     <div className="mobile-app-container">
       <header className="app-header">
+        <div className="header-top">
+          <div className="header-user-info">
+            <span className="user-avatar">👤</span>
+            <span className="user-name">{kullanici?.adSoyad}</span>
+          </div>
+          <button className="logout-btn" onClick={cikisYap}>
+            Çıkış Yap
+          </button>
+        </div>
         <h1>DeğerBiç 🔍</h1>
         <p>Envanter ve Değerleme Asistanı</p>
       </header>
 
       <main className="app-content">
-        {/* TOPLAM DEĞER KARTI (Orijinal tasarımın) */}
+        {/* TOPLAM DEĞER KARTI */}
         <div className="total-value-card">
           <h3>Toplam Portföy Değeri</h3>
           <div className="amount">{toplamDeger.toLocaleString('tr-TR')} TL</div>
         </div>
 
-        {/* YENİ: ARAMA VE FİLTRELEME ÇUBUĞU */}
+        {/* ARAMA VE FİLTRELEME ÇUBUĞU */}
         <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', marginTop: '10px' }}>
           <input
             type="text"
@@ -136,12 +158,10 @@ function App() {
 
         <div className="content-header">
           <h2>Koleksiyonum</h2>
-          {/* Orijinal item.length yerine filtrelenmisEsyalar.length kullanıyoruz */}
           <span className="item-count">{filtrelenmisEsyalar.length} Eşya</span>
         </div>
 
         <div className="item-list">
-          {/* LİSTELEME: Artık 'items' yerine 'filtrelenmisEsyalar' dönüyor */}
           {filtrelenmisEsyalar.length === 0 ? (
             <p style={{ textAlign: 'center', color: '#888', marginTop: '20px' }}>Bu kriterlere uygun eşya bulunamadı.</p>
           ) : (
@@ -150,6 +170,8 @@ function App() {
                 <div className="item-info">
                   <h3>{item.isim}</h3>
                   <span className="item-category">{item.kategori}</span>
+                  {item.kondisyon && <span className="item-kondisyon">Kondisyon: {item.kondisyon}</span>}
+                  {item.aciklama && <p className="item-description">{item.aciklama}</p>}
                 </div>
                 <div className="item-actions">
                   <div className="item-value">{item.deger}</div>
@@ -165,7 +187,7 @@ function App() {
         </button>
       </main>
 
-      {/* MODAL FORM (Senin orijinal fotoğraf yüklemeli formun) */}
+      {/* MODAL FORM */}
       {isFormOpen && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -205,6 +227,27 @@ function App() {
               <div className="input-group">
                 <label>Tahmini Değer (TL)</label>
                 <input type="number" placeholder="Örn: 5000" value={deger} onChange={(e) => setDeger(e.target.value)} />
+              </div>
+
+              <div className="input-group">
+                <label>Kondisyon</label>
+                <select value={kondisyon} onChange={(e) => setKondisyon(e.target.value)}>
+                  <option value="Mükemmel">Mükemmel</option>
+                  <option value="İyi">İyi</option>
+                  <option value="Orta">Orta</option>
+                  <option value="Kötü">Kötü</option>
+                </select>
+              </div>
+
+              <div className="input-group">
+                <label>Açıklama</label>
+                <textarea
+                  placeholder="Eşya hakkında kısa bir açıklama yazın..."
+                  value={aciklama}
+                  onChange={(e) => setAciklama(e.target.value)}
+                  rows={3}
+                  style={{ width: '100%', padding: '12px', border: '1px solid #d1d5db', borderRadius: '10px', fontSize: '15px', backgroundColor: '#f9fafb', color: '#000', resize: 'vertical', fontFamily: 'inherit' }}
+                />
               </div>
 
               <div className="modal-buttons">
