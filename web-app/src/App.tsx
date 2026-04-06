@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from './context/AuthContext';
+import ThemeToggle from './components/ThemeToggle';
 import './App.css';
 
 // TYPESCRIPT İÇİN KİMLİK KARTI (Interface)
@@ -34,7 +35,7 @@ function App() {
   const [aciklama, setAciklama] = useState('');
   const [kondisyon, setKondisyon] = useState('İyi');
 
-  // YENİ: Arama ve Filtreleme State'leri (5. Hafta)
+  // Arama ve Filtreleme State'leri
   const [aramaSorgusu, setAramaSorgusu] = useState('');
   const [filtreKategori, setFiltreKategori] = useState('Tümü');
 
@@ -42,15 +43,14 @@ function App() {
     localStorage.setItem('koleksiyonum', JSON.stringify(items));
   }, [items]);
 
-  // YENİ: FİLTRELEME MOTORU
-  // Ekranda sadece arama ve kategoriye uyan eşyaları gösterir
+  // FİLTRELEME MOTORU
   const filtrelenmisEsyalar = items.filter((item) => {
     const aramaUyumu = item.isim.toLowerCase().includes(aramaSorgusu.toLowerCase());
     const kategoriUyumu = filtreKategori === 'Tümü' || item.kategori === filtreKategori;
     return aramaUyumu && kategoriUyumu;
   });
 
-  // GÜNCELLEME: Toplam değer artık sadece "filtrelenmiş" (ekranda görünen) eşyaları hesaplar
+  // Toplam değer hesaplaması
   const toplamDeger = filtrelenmisEsyalar.reduce((toplam: number, item: Esya) => {
     const rakam = parseInt(item.deger.replace(/[^0-9]/g, '')) || 0;
     return toplam + rakam;
@@ -66,7 +66,6 @@ function App() {
   const esyaKaydet = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // HATA KONTROLÜ (Form Validasyonu)
     if (!isim.trim() || !deger) {
       alert("⚠️ Lütfen isim ve değer alanlarını doldurun!");
       return;
@@ -81,7 +80,7 @@ function App() {
       isim: isim.trim(),
       kategori: kategori,
       deger: deger + ' TL',
-      renk: '#8b5cf6',
+      renk: '#3b82f6',
       aciklama: aciklama.trim(),
       kondisyon: kondisyon
     };
@@ -113,6 +112,10 @@ function App() {
 
   return (
     <div className="mobile-app-container">
+      {/* TEMA TOGGLE */}
+      <ThemeToggle />
+
+      {/* HEADER */}
       <header className="app-header">
         <div className="header-top">
           <div className="header-user-info">
@@ -135,18 +138,21 @@ function App() {
         </div>
 
         {/* ARAMA VE FİLTRELEME ÇUBUĞU */}
-        <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', marginTop: '10px' }}>
-          <input
-            type="text"
-            placeholder="🔍 Eşya Ara..."
-            value={aramaSorgusu}
-            onChange={(e) => setAramaSorgusu(e.target.value)}
-            style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #ddd', outline: 'none' }}
-          />
+        <div className="search-filter-bar">
+          <div className="search-input-wrapper">
+            <span className="search-icon">🔍</span>
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Eşya Ara..."
+              value={aramaSorgusu}
+              onChange={(e) => setAramaSorgusu(e.target.value)}
+            />
+          </div>
           <select
+            className="filter-select"
             value={filtreKategori}
             onChange={(e) => setFiltreKategori(e.target.value)}
-            style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ddd', outline: 'none', backgroundColor: 'white', color: 'black' }}
           >
             <option value="Tümü">Tüm Kategoriler</option>
             <option value="Koleksiyon Kartı">Koleksiyon Kartı</option>
@@ -161,16 +167,21 @@ function App() {
           <span className="item-count">{filtrelenmisEsyalar.length} Eşya</span>
         </div>
 
+        {/* EŞYA LİSTESİ */}
         <div className="item-list">
           {filtrelenmisEsyalar.length === 0 ? (
-            <p style={{ textAlign: 'center', color: '#888', marginTop: '20px' }}>Bu kriterlere uygun eşya bulunamadı.</p>
+            <div className="empty-state">
+              <div className="empty-state-icon">📦</div>
+              <h3>Henüz eşya yok</h3>
+              <p>Koleksiyonuna ilk eşyayı eklemek için aşağıdaki butona tıkla!</p>
+            </div>
           ) : (
             filtrelenmisEsyalar.map((item: Esya) => (
               <div key={item.id} className="item-card" style={{ borderLeftColor: item.renk }}>
                 <div className="item-info">
                   <h3>{item.isim}</h3>
                   <span className="item-category">{item.kategori}</span>
-                  {item.kondisyon && <span className="item-kondisyon">Kondisyon: {item.kondisyon}</span>}
+                  {item.kondisyon && <span className="item-kondisyon">{item.kondisyon}</span>}
                   {item.aciklama && <p className="item-description">{item.aciklama}</p>}
                 </div>
                 <div className="item-actions">
@@ -187,10 +198,15 @@ function App() {
         </button>
       </main>
 
+      {/* FOOTER */}
+      <footer className="app-footer">
+        <p>© 2026 <span>DeğerBiç</span> — Envanter ve Değerleme Asistanı</p>
+      </footer>
+
       {/* MODAL FORM */}
       {isFormOpen && (
-        <div className="modal-overlay">
-          <div className="modal-content">
+        <div className="modal-overlay" onClick={formuKapat}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h2>Yeni Eşya Ekle</h2>
 
             <div className="upload-area">
@@ -246,7 +262,6 @@ function App() {
                   value={aciklama}
                   onChange={(e) => setAciklama(e.target.value)}
                   rows={3}
-                  style={{ width: '100%', padding: '12px', border: '1px solid #d1d5db', borderRadius: '10px', fontSize: '15px', backgroundColor: '#f9fafb', color: '#000', resize: 'vertical', fontFamily: 'inherit' }}
                 />
               </div>
 
