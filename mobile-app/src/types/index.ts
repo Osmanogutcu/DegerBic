@@ -12,6 +12,7 @@ export interface Esya {
   aciklama: string;
   kondisyon: string;
   fotografUri?: string; // Hafta 9: Fotoğraf desteği
+  eklenmeTarihi: string; // Hafta 10: Tarih kaydı
 }
 
 export interface Kullanici {
